@@ -1,0 +1,190 @@
+---
+title: "simualtion"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=FALSE,message=TRUE}
+setwd("C:/Users/UOS/Documents/GitHub/admm")
+source("admmgev.R")
+if(!require(dplyr)){install.packages("dplyr")};require(dplyr)
+
+load("C:/Users/UOS/서울시립대학교/전종준 - lab_work/Lab_process/HIJ/kma_data/Pr_46.RData")
+st = distinct(Pr_46,stnlds)
+
+```
+### lamda = 0.02
+```{r,echo=FALSE}
+par(mfrow=c(2,2))
+for (i in 1:nrow(st)) {
+  # i = 1
+  x = Pr_46 %>% subset(stnlds == st[i,])
+  x = x$pr
+  
+  # optim control
+  optim_controlList = list()
+  optim_controlList$maxit = 1e+3
+  
+  #init_value
+  n = length(x)
+  z = diag(n)
+  # plot(x)
+  true_beta = rep(0,n)
+  
+  dmatrix = mat_func(n)
+  rho = 0.5;lam = 0.02
+  z_init = rep(0,n-2) ; u_init = rep(1,n-2)
+  stepsize = 0.01 
+  
+  start <- list()
+  start$scale <- sqrt(6 * var(x))/pi
+  start$loc <- mean(x) - 0.58 * start$scale #이거......
+  tvec = c(true_beta,0,0)
+  tvec[1:n] = start$loc  #init mu value
+  tvec[n+1] = start$scale
+  
+  #update
+  for (iter in 1:200) {
+    # cat("*****iter:::", iter==200, "\n")
+    
+    #mu, sigma, k optim
+    old_tvec = gevreg(x = x,z = z)
+    old_mu = old_tvec[1:n]
+    
+    # z update in ADMM
+    tmp_z = func_z(dmatrix = dmatrix, mu = old_mu, u = u_init,lam = lam, rho = rho)
+    
+    # u update in ADMM
+    tmp_u = func_u(dmatrix = dmatrix , mu = old_mu, z = tmp_z, u = u_init)
+    
+    u_init = tmp_u ; z_init = tmp_z
+    tvec = old_tvec
+    
+  }
+  
+  plot(old_mu, type = "l",main = paste("지역:",st[i,]))
+  
+}
+
+```
+
+
+###lamda = 0.2
+```{r,echo=FALSE}
+par(mfrow=c(2,2))
+for (i in 1:nrow(st)) {
+  # i = 1
+  x = Pr_46 %>% subset(stnlds == st[i,])
+  x = x$pr
+  
+  # optim control
+  optim_controlList = list()
+  optim_controlList$maxit = 1e+3
+  
+  #init_value
+  n = length(x)
+  z = diag(n)
+  # plot(x)
+  true_beta = rep(0,n)
+  
+  dmatrix = mat_func(n)
+  rho = 0.5;lam = 0.2
+  z_init = rep(0,n-2) ; u_init = rep(1,n-2)
+  stepsize = 0.01 
+  
+  start <- list()
+  start$scale <- sqrt(6 * var(x))/pi
+  start$loc <- mean(x) - 0.58 * start$scale #이거......
+  tvec = c(true_beta,0,0)
+  tvec[1:n] = start$loc  #init mu value
+  tvec[n+1] = start$scale
+  
+  #update
+  for (iter in 1:200) {
+    # cat("*****iter:::", iter==200, "\n")
+    
+    #mu, sigma, k optim
+    old_tvec = gevreg(x = x,z = z)
+    old_mu = old_tvec[1:n]
+    
+    # z update in ADMM
+    tmp_z = func_z(dmatrix = dmatrix, mu = old_mu, u = u_init,lam = lam, rho = rho)
+    
+    # u update in ADMM
+    tmp_u = func_u(dmatrix = dmatrix , mu = old_mu, z = tmp_z, u = u_init)
+    
+    u_init = tmp_u ; z_init = tmp_z
+    tvec = old_tvec
+    
+  }
+  
+  plot(old_mu, type = "l",main = paste("지역:",st[i,]))
+  
+}
+
+```
+
+###lamda = 2
+```{r,echo=FALSE}
+par(mfrow=c(2,2))
+for (i in 1:nrow(st)) {
+  # i = 1
+  x = Pr_46 %>% subset(stnlds == st[i,])
+  x = x$pr
+  
+  # optim control
+  optim_controlList = list()
+  optim_controlList$maxit = 1e+3
+  
+  #init_value
+  n = length(x)
+  z = diag(n)
+  # plot(x)
+  true_beta = rep(0,n)
+  
+  dmatrix = mat_func(n)
+  rho = 0.5;lam = 2
+  z_init = rep(0,n-2) ; u_init = rep(1,n-2)
+  stepsize = 0.01 
+  
+  start <- list()
+  start$scale <- sqrt(6 * var(x))/pi
+  start$loc <- mean(x) - 0.58 * start$scale #이거......
+  tvec = c(true_beta,0,0)
+  tvec[1:n] = start$loc  #init mu value
+  tvec[n+1] = start$scale
+  
+  #update
+  for (iter in 1:200) {
+    # cat("*****iter:::", iter==200, "\n")
+    
+    #mu, sigma, k optim
+    old_tvec = gevreg(x = x,z = z)
+    old_mu = old_tvec[1:n]
+    
+    # z update in ADMM
+    tmp_z = func_z(dmatrix = dmatrix, mu = old_mu, u = u_init,lam = lam, rho = rho)
+    
+    # u update in ADMM
+    tmp_u = func_u(dmatrix = dmatrix , mu = old_mu, z = tmp_z, u = u_init)
+    
+    u_init = tmp_u ; z_init = tmp_z
+    tvec = old_tvec
+    
+  }
+  
+  plot(old_mu, type = "l",main = paste("지역:",st[i,]))
+  
+}
+
+```
+
+
+
+
+
+
+
