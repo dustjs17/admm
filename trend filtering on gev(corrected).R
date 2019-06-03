@@ -1,6 +1,4 @@
 rm(list = ls())
-if(!require(Deriv)){install.packages("Deriv")};library(Deriv)
-if(!require(evd)){install.packages("evd")};library(evd)
 
 setwd("C:/Users/UOS/Documents/GitHub/admm")
 source("admmgev.R")

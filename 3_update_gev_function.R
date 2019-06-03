@@ -1,4 +1,3 @@
-rm(list = ls())
 if(!require(Deriv)){install.packages("Deriv")};library(Deriv)
 if(!require(evd)){install.packages("evd")};library(evd)
 
@@ -15,8 +14,7 @@ func_z <- function(dmatrix,mu,u,lam,rho){
 
 
 #u_function
-func_u <- function(dmatrix,mu,z,u) 
-{
+func_u <- function(dmatrix,mu,z,u) {
   u <- u + (dmatrix %*% mu) - z
   return(u)
 }
