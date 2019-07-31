@@ -31,7 +31,7 @@ mat_func = function(n) {
 }
 
 ## gevfunction 
-gevreg = function(x, z)
+gevreg = function(x, z, ctr_list)
 {
   
   l2gev = function (tvec, dmatrix, rho, z_init, u_init)
@@ -69,7 +69,11 @@ gevreg = function(x, z)
     return(d)
   }
   
-  return( optim(tvec, l2gev, dmatrix = dmatrix,
-                rho=rho, z_init = z_init, u_init = u_init, method = "BFGS")$par )
+  est = optim(tvec, l2gev, dmatrix = dmatrix,
+              rho=init_rho, z_init = z_init, u_init = u_init, method = "BFGS",
+              control = ctr_list)$par
+  
+  
+  return(est)
 }
 

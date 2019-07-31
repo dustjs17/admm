@@ -2,13 +2,14 @@ rm(list = ls())
 
 setwd("C:/Users/UOS/Documents/GitHub/admm")
 source("3_update_gev_function.R")
+if(!require(InspectChangepoint)){install.packages("InspectChangepoint")};library(InspectChangepoint)
 
 n = 100
 true_vec = c(100,30,0.1)
 
 #sin function
 set.seed(1)
-y = sin(seq(0,2*pi,length.out = n)); mt = y +100
+y = sin(seq(0,2*pi,length.out = n))*10; mt = y +100
 x = rep(0,n)
 for (i in 1:n) {
   # i = 1
@@ -52,7 +53,6 @@ for (iter in 1:400) {
                                  error = function(e){solve(init_hmat_mu+ rhodtd + diag(tol,nrow(init_hmat_mu)))})%*% 
         (init_grad_mu + sec_term %*%(dmatrix%*%old_mu - z_init + u_init))
       
-      
       old_mu = new_mu
       
     }
@@ -69,18 +69,25 @@ for (iter in 1:400) {
     }
     
   }
-    
-  # kkt condition - mu,theta 
+ 
+  # kkt condition,loss value check - mu,theta
   # if(iter %% 10 == 0){
   #   mu = old_mu; sigma = old_sk[1]; k = old_sk[2]
-  #   
-  #   # mu check
+  # 
+  #   # kkt - mu check
   #   kkt_mu = eval(Gmu) + sec_term %*% (dmatrix %*% mu -z_init + u_init)
-  #   # theta check
+  #   # kkt - theta check
   #   kkt_theta = apply(eval(Gtheta),2,sum)
+  #   # loss value 
+  #   first_loss = apply(func_gev(x = x, sigma = sigma,k = k, mu = mu),2,sum)
+  #   third_loss = apply(func_thr(rho = rho,d = dmatrix,mu = mu,z = z_init,u = u_init),
+  #                      2, sum)
+  #   loss = first_loss + third_loss
+  #   
   #   
   #   cat("**iter::",iter,"\n")
-  #   cat("current_mu::", max(mu), min(mu),"\n")
+  #   cat("gev_loss::", loss, "\n")
+  #   # cat("current_mu::", max(mu), min(mu),"\n")
   #   cat("mu_gradient::", max(kkt_mu), min(kkt_mu),"\n")
   #   cat("theta_gradient::", max(kkt_theta), min(kkt_theta),'\n')
   # }
@@ -89,12 +96,22 @@ for (iter in 1:400) {
   tmp_z = func_z(dmatrix = dmatrix, mu = old_mu, u = u_init,lam = lam, rho = rho)
   
   # kkt condition - z check
-  if(iter %% 10 ==0){
-    # kkt_z = rho * (tmp_z - dmatrix %*% mu - u_init)
-    # cat("z_gradient::",max(kkt_z),min(kkt_z),'\n',"#######################################","\n")
-    
-    plot(new_mu,type = "l",main = paste0("iter:",iter))
-  }
+  # if(iter %% 10 ==0){
+  #   
+  #   kkt_z = rho * (tmp_z - (dmatrix %*% old_mu) - u_init)
+  #   z_loss = lam*sum(abs(tmp_z))
+  #   third_loss = apply(func_thr(rho = rho,d = dmatrix,mu = old_mu,z = tmp_z,u = u_init),
+  #                      2,sum)
+  #   # sec_loss = z_loss + third_loss  
+  #   cat("number of nonzero::",length(which(!(tmp_z == 0))),'\n')
+  #   cat("z_value::",max(tmp_z),min(tmp_z),"\n")
+  #   cat("z_loss::",z_loss,'\n')
+  #   cat("third_loss::",third_loss,"\n")
+  #   cat("z_gradient::",max(kkt_z),min(kkt_z),'\n',"#######################################","\n")
+  #   
+  #   
+  #   plot(new_mu,type = "l",main = paste0("iter:",iter))
+  # }
   
   # u update in ADMM
   tmp_u = func_u(dmatrix = dmatrix , mu = old_mu, z = tmp_z, u = u_init)
@@ -106,3 +123,6 @@ for (iter in 1:400) {
 # plot(new_mu,type = "l",main = paste0(" symbolic ,",  "lambda = ",lam))
 symbolic = new_mu
 symbolic_sk = old_sk
+
+#condition check
+(dmatrix%*% new_mu)- diag(1,(n-2),(n-2)) %*% z_init

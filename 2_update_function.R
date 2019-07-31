@@ -33,19 +33,19 @@ mat_func = function(n) {
 }
 
 #update function
-tf_func_beta <- function(first_term,y,z,u,rho,sec_term) {
-  beta = first_term %*% {y + sec_term %*% (z-u)}
+update_beta = function(imatrix,solve_term,y,rhodt,z,u){
+  beta = solve_term  %*% (y + rhodt %*% (z-u))
   return(beta)
 }
 
-tf_func_z <- function(dmatrix,beta,u,lam,rho){
-  z = ifelse(abs(dmatrix %*% beta + u) > (lam/rho) , 
-             (dmatrix %*% beta) + u - (sign(u + (dmatrix %*% beta)) * (lam /rho)), 0)
+update_z = function(dmatrix,beta,u,rho,lam){
+  z = ifelse(abs(dmatrix%*%beta + u)>lam/rho,
+             dmatrix%*%beta + u - sign(dmatrix%*%beta + u)*lam/rho,0)
   return(z)
 }
 
-tf_func_u <- function(dmatrix,beta,z,u) 
-{
-  u <- u + (dmatrix %*% beta) - z
+
+update_u = function(u,dmatrix,beta,z){
+  u = u + dmatrix%*%beta - z
   return(u)
 }
